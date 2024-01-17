@@ -47,9 +47,12 @@ static void sbi_boot_print_banner(struct sbi_scratch *scratch)
 		   OPENSBI_VERSION_MINOR);
 #endif
 
+#ifndef OPENSBI_QUIET
 	sbi_printf(BANNER);
+#endif
 }
 
+#ifndef OPENSBI_QUIET
 static void sbi_boot_print_general(struct sbi_scratch *scratch)
 {
 	char str[128];
@@ -96,7 +99,9 @@ static void sbi_boot_print_general(struct sbi_scratch *scratch)
 		   sbi_ecall_version_major(), sbi_ecall_version_minor());
 	sbi_printf("\n");
 }
+#endif
 
+#ifndef OPENSBI_QUIET
 static void sbi_boot_print_domains(struct sbi_scratch *scratch)
 {
 	if (scratch->options & SBI_SCRATCH_NO_BOOT_PRINTS)
@@ -105,7 +110,9 @@ static void sbi_boot_print_domains(struct sbi_scratch *scratch)
 	/* Domain details */
 	sbi_domain_dump_all("      ");
 }
+#endif
 
+#ifndef OPENSBI_QUIET
 static void sbi_boot_print_hart(struct sbi_scratch *scratch, u32 hartid)
 {
 	int xlen;
@@ -141,6 +148,7 @@ static void sbi_boot_print_hart(struct sbi_scratch *scratch, u32 hartid)
 		   sbi_hart_mhpm_count(scratch));
 	sbi_hart_delegation_dump(scratch, "Boot HART ", "         ");
 }
+#endif
 
 static spinlock_t coldboot_lock = SPIN_LOCK_INITIALIZER;
 static struct sbi_hartmask coldboot_wait_hmask = { 0 };
@@ -287,7 +295,9 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 		sbi_hart_hang();
 	}
 
+#ifndef OPENSBI_QUIET
 	sbi_boot_print_general(scratch);
+#endif
 
 	/*
 	 * Note: Finalize domains after HSM initialization so that we
@@ -302,15 +312,18 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 		sbi_hart_hang();
 	}
 
+#ifndef OPENSBI_QUIET
 	sbi_boot_print_domains(scratch);
+#endif
 
-	rc = sbi_hart_pmp_configure(scratch);
-	if (rc) {
-		sbi_printf("%s: PMP configure failed (error %d)\n",
-			   __func__, rc);
-		sbi_hart_hang();
-	}
-
+#ifdef K230_LITTLE_CORE
+	 rc = sbi_hart_pmp_configure(scratch);
+	 if (rc) {
+	 	sbi_printf("%s: PMP configure failed (error %d)\n",
+	 		   __func__, rc);
+	 	sbi_hart_hang();
+	 }
+#endif
 	/*
 	 * Note: Platform final initialization should be last so that
 	 * it sees correct domain assignment and PMP configuration.
@@ -322,7 +335,9 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 		sbi_hart_hang();
 	}
 
+#ifndef OPENSBI_QUIET
 	sbi_boot_print_hart(scratch, hartid);
+#endif
 
 	wake_coldboot_harts(scratch, hartid);
 

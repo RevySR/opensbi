@@ -26,6 +26,7 @@
 #define UART_MSR_OFFSET		6	/* In:  Modem Status Register */
 #define UART_SCR_OFFSET		7	/* I/O: Scratch Register */
 #define UART_MDR1_OFFSET	8	/* I/O:  Mode Register */
+#define UART_DLF_OFFSET	    48	/* Out:  Divisor Latch Fraction Register*/
 
 #define UART_LSR_FIFOE		0x80	/* Fifo error */
 #define UART_LSR_TEMT		0x40	/* Transmitter empty */
@@ -93,7 +94,10 @@ static struct sbi_console_device uart8250_console = {
 int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
 		  u32 reg_width)
 {
-	u16 bdiv;
+	u32 bdiv;
+	u32 dlf;
+	u32 dlh;
+	u32 dll;
 
 	uart8250_base      = (volatile void *)base;
 	uart8250_reg_shift = reg_shift;
@@ -101,7 +105,16 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
 	uart8250_in_freq   = in_freq;
 	uart8250_baudrate  = baudrate;
 
-	bdiv = uart8250_in_freq / (16 * uart8250_baudrate);
+	bdiv = uart8250_in_freq /  uart8250_baudrate;
+
+	dlh = bdiv >> 12;
+	dll = (bdiv - (dlh << 12)) / 16;
+	dlf = bdiv - (dlh << 12)  - dll * 16;
+	if(dlh == 0 && dll == 0)
+	{
+		dll = 1;
+		dlf = 0;
+	}
 
 	/* Disable all interrupts */
 	set_reg(UART_IER_OFFSET, 0x00);
@@ -110,9 +123,11 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
 
 	if (bdiv) {
 		/* Set divisor low byte */
-		set_reg(UART_DLL_OFFSET, bdiv & 0xff);
+		set_reg(UART_DLL_OFFSET, dll);
 		/* Set divisor high byte */
-		set_reg(UART_DLM_OFFSET, (bdiv >> 8) & 0xff);
+		set_reg(UART_DLM_OFFSET, dlh);
+		/* Set divisor fraction byte*/
+		set_reg(UART_DLF_OFFSET, dlf);
 	}
 
 	/* 8 bits, no parity, one stop bit */

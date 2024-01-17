@@ -28,6 +28,9 @@ static int serial_uart8250_init(void *fdt, int nodeoff,
 static const struct fdt_match serial_uart8250_match[] = {
 	{ .compatible = "ns16550" },
 	{ .compatible = "ns16550a" },
+#ifdef K230_LITTLE_CORE
+	{ .compatible = "snps,dw-apb-uart" },
+#endif
 	{ },
 };
 

@@ -181,7 +181,7 @@ int sbi_hart_pmp_configure(struct sbi_scratch *scratch)
 {
 	struct sbi_domain_memregion *reg;
 	struct sbi_domain *dom = sbi_domain_thishart_ptr();
-	unsigned int pmp_idx = 0, pmp_flags, pmp_bits, pmp_gran_log2;
+	unsigned int pmp_idx = 2, pmp_flags, pmp_bits, pmp_gran_log2;
 	unsigned int pmp_count = sbi_hart_pmp_count(scratch);
 	unsigned long pmp_addr = 0, pmp_addr_max = 0;
 
@@ -191,6 +191,7 @@ int sbi_hart_pmp_configure(struct sbi_scratch *scratch)
 	pmp_gran_log2 = log2roundup(sbi_hart_pmp_granularity(scratch));
 	pmp_bits = sbi_hart_pmp_addrbits(scratch) - 1;
 	pmp_addr_max = (1UL << pmp_bits) | ((1UL << pmp_bits) - 1);
+	pmp_addr_max = 0x3fffffffff;
 
 	sbi_domain_for_each_memregion(dom, reg) {
 		if (pmp_count <= pmp_idx)
@@ -218,6 +219,30 @@ int sbi_hart_pmp_configure(struct sbi_scratch *scratch)
 
 	return 0;
 }
+
+int sbi_write_enable(int write_enable)
+{
+	ulong prot;
+	ulong addr;
+	ulong log2size;
+
+	if(write_enable)
+	{
+		prot	  = PMP_R | PMP_W;
+		addr	  = 0x91213000;
+		log2size = log2roundup(0x1000);
+	}
+	else
+	{
+		prot	  = PMP_R;
+		addr	  = 0x91213000;
+		log2size = log2roundup(0x1000);
+	}
+	pmp_set(1, prot, addr, log2size);
+
+	return 0;
+}
+
 
 /**
  * Check whether a particular hart feature is available

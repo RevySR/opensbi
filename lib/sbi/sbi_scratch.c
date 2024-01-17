@@ -14,7 +14,12 @@
 #include <sbi/sbi_scratch.h>
 #include <sbi/sbi_string.h>
 
+#ifdef K230_LITTLE_CORE
 u32 last_hartid_having_scratch = SBI_HARTMASK_MAX_BITS;
+#else
+u32 last_hartid_having_scratch = SBI_HARTMASK_MAX_BITS - 1;
+#endif
+
 struct sbi_scratch *hartid_to_scratch_table[SBI_HARTMASK_MAX_BITS] = { 0 };
 
 static spinlock_t extra_lock = SPIN_LOCK_INITIALIZER;
@@ -74,7 +79,11 @@ done:
 	spin_unlock(&extra_lock);
 
 	if (ret) {
+#ifdef K230_LITTLE_CORE
 		for (i = 0; i < sbi_scratch_last_hartid(); i++) {
+#else
+		for (i = 0; i <= sbi_scratch_last_hartid(); i++) {
+#endif
 			rscratch = sbi_hartid_to_scratch(i);
 			if (!rscratch)
 				continue;

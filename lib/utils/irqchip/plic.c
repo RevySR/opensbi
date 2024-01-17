@@ -21,6 +21,19 @@
 #define PLIC_CONTEXT_BASE 0x200000
 #define PLIC_CONTEXT_STRIDE 0x1000
 
+#ifdef K230_LITTLE_CORE
+#define PLIC_CTRL 0x01FFFFC
+
+static int plic_enable_deleg(struct plic_data *plic)
+{
+        /* Delegate plic enable into S-mode */
+       volatile void *plic_ctrl = (void *)plic->addr + PLIC_CTRL;
+        writel(0x1,plic_ctrl);
+
+        return 0;
+}
+#endif
+
 static void plic_set_priority(struct plic_data *plic, u32 source, u32 val)
 {
 	volatile void *plic_priority = (void *)plic->addr +
@@ -82,6 +95,10 @@ int plic_warm_irqchip_init(struct plic_data *plic,
 	if (s_cntx_id > -1)
 		plic_set_thresh(plic, s_cntx_id, 0x7);
 
+#ifdef K230_LITTLE_CORE
+	plic_enable_deleg(plic);
+#endif
+
 	return 0;
 }
 
@@ -95,6 +112,10 @@ int plic_cold_irqchip_init(struct plic_data *plic)
 	/* Configure default priorities of all IRQs */
 	for (i = 1; i <= plic->num_src; i++)
 		plic_set_priority(plic, i, 1);
+
+#ifdef K230_LITTLE_CORE
+        plic_enable_deleg(plic);
+#endif
 
 	return 0;
 }
