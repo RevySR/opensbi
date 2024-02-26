@@ -24,13 +24,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: k230-v6.8
+          - name: k230-v6.6-rv64
             abi: rv64
             gcc: gcc-13
-            branch: k230-v6.8-wip
+            branch: k230-6.6-ilp32
             triple: riscv64-unknown-linux-gnu-
 
-          - name: k230-v6.6
+          - name: k230-v6.6-rv64ilp32
             abi: rv64ilp32
             gcc: rv64ilp32
             branch: k230-6.6-ilp32
