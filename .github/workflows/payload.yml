@@ -88,6 +88,12 @@ jobs:
                 
                 make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
                 make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc)
+
+                if [[ ${{ matrix.abi }} = "rv64ilp32" ]]; then
+                  sed -i 's#rv64imafdcvxthead_svpbmt_zicbom#rv64imafdc#' arch/riscv/boot/dts/canaan/k230.dtsi
+                  cat arch/riscv/boot/dts/canaan/k230.dtsi
+                fi
+
                 cp -v arch/riscv/boot/Image ../output/Image_${{ matrix.abi }}
                 cp -v arch/riscv/boot/dts/canaan/k230_evb.dtb ../output/k230_evb_${{ matrix.abi }}.dtb
                 cp -v arch/riscv/boot/dts/canaan/k230_cammv.dtb ../output/k230_cammv_${{ matrix.abi }}.dtb
