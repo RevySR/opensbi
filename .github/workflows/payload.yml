@@ -81,17 +81,18 @@ jobs:
         run: |
               pushd linux
                 if [[ ${{ matrix.abi }} = "rv64ilp32" ]]; then
-                  make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} k230_evb_linux_enable_vector_defconfig 64ilp32.config
+                  make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} k230_evb_linux_enable_vector_defconfig 64ilp32.config
                 else
-                  make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} k230_evb_linux_enable_vector_defconfig
+                  make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} k230_evb_linux_enable_vector_defconfig
                 fi
                 
-                make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
-                make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc)
+                make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
+                make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc)
 
                 if [[ ${{ matrix.abi }} = "rv64ilp32" ]]; then
                   sed -i 's#rv64imafdcvxthead_svpbmt_zicbom#rv64imafdc#' arch/riscv/boot/dts/canaan/k230.dtsi
                   cat arch/riscv/boot/dts/canaan/k230.dtsi
+                  make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
                 fi
 
                 cp -v vmlinux ../output/vmlinux_${{ matrix.abi }}
