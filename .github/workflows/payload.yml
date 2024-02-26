@@ -94,7 +94,9 @@ jobs:
                   cat arch/riscv/boot/dts/canaan/k230.dtsi
                 fi
 
+                cp -v vmlinux ../output/vmlinux_${{ matrix.abi }}
                 cp -v arch/riscv/boot/Image ../output/Image_${{ matrix.abi }}
+                cp -v Documentation/admin-guide/kdump/gdbmacros.txt ../output/gdbmacros_${{ matrix.abi }}.txt
                 cp -v arch/riscv/boot/dts/canaan/k230_evb.dtb ../output/k230_evb_${{ matrix.abi }}.dtb
                 cp -v arch/riscv/boot/dts/canaan/k230_cammv.dtb ../output/k230_cammv_${{ matrix.abi }}.dtb
               popd
