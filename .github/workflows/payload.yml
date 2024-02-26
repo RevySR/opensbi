@@ -89,12 +89,6 @@ jobs:
                 make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
                 make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc)
 
-                if [[ ${{ matrix.abi }} = "rv64ilp32" ]]; then
-                  sed -i 's#rv64imafdcvxthead_svpbmt_zicbom#rv64imafdc#' arch/riscv/boot/dts/canaan/k230.dtsi
-                  cat arch/riscv/boot/dts/canaan/k230.dtsi
-                  make ARCH=${ARCH} EXTRA_CFLAGS+=-g CROSS_COMPILE=${CROSS_COMPILE} -j$(nproc) dtbs
-                fi
-
                 cp -v vmlinux ../output/vmlinux_${{ matrix.abi }}
                 cp -v arch/riscv/boot/Image ../output/Image_${{ matrix.abi }}
                 cp -v Documentation/admin-guide/kdump/gdbmacros.txt ../output/gdbmacros_${{ matrix.abi }}.txt
