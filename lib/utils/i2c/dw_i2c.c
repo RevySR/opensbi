@@ -76,7 +76,7 @@ static int dw_i2c_adapter_poll(struct dw_i2c_adapter *adap,
 			       u32 mask, u32 addr,
 			       bool inverted)
 {
-	unsigned int timeout = 10; /* msec */
+	unsigned int timeout = 100; /* msec */
 	int count = 0;
 	u32 val;
 
