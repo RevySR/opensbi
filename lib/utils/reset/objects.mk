@@ -27,9 +27,6 @@ libsbiutils-objs-$(CONFIG_FDT_RESET_SOPHGO_CPLD) += reset/fdt_reset_sophgo_cpld.
 carray-fdt_reset_drivers-$(CONFIG_FDT_RESET_SOPHGO_MCU) += fdt_reset_sophgo_mcu
 libsbiutils-objs-$(CONFIG_FDT_RESET_SOPHGO_MCU) += reset/fdt_reset_sophgo_mcu.o
 
-carray-fdt_reset_drivers-$(CONFIG_FDT_RESET_SOPHGO_WDT) += fdt_reset_sophgo_wdt
-libsbiutils-objs-$(CONFIG_FDT_RESET_SOPHGO_WDT) += reset/fdt_reset_sophgo_wdt.o
-
 carray-fdt_reset_drivers-$(CONFIG_FDT_RESET_SUNXI_WDT) += fdt_reset_sunxi_wdt
 libsbiutils-objs-$(CONFIG_FDT_RESET_SUNXI_WDT) += reset/fdt_reset_sunxi_wdt.o
 
