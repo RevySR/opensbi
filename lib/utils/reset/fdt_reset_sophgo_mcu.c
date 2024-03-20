@@ -49,6 +49,7 @@ static inline int mango_sanity_check(struct i2c_adapter *adap, uint32_t reg)
 
 	/* check board type*/
 	ret = i2c_adapter_reg_read(adap, reg, REG_MCU_BOARD_TYPE, &val);
+	sbi_printf("board type: %u, ret: %d", val, ret);
 	if (ret)
 		return ret;
 
